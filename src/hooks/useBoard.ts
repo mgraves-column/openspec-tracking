@@ -1,20 +1,22 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { OpenSpecCard, ColumnId, Priority, EpicId } from '../types';
-import { SAMPLE_CARDS } from '../data/sampleData';
-import { loadBoardState, saveBoardState } from '../utils/persistence';
+import { SAMPLE_CARDS, DATA_VERSION } from '../data/sampleData';
+import { loadBoardState, saveBoardState, mergeBoardState } from '../utils/persistence';
 import { getEpic } from '../utils/epics';
 
 export function useBoard() {
   const [cards, setCards] = useState<OpenSpecCard[]>(() => {
     const saved = loadBoardState();
-    return saved ? saved.cards : SAMPLE_CARDS;
+    if (!saved) return SAMPLE_CARDS;
+    if ((saved.dataVersion ?? 0) < DATA_VERSION) return mergeBoardState(saved);
+    return saved.cards;
   });
   const [searchQuery, setSearchQuery] = useState('');
   const [priorityFilter, setPriorityFilter] = useState<Priority | 'all'>('all');
   const [epicFilter, setEpicFilter] = useState<EpicId | 'all'>('all');
 
   useEffect(() => {
-    saveBoardState(cards);
+    saveBoardState(cards, DATA_VERSION);
   }, [cards]);
 
   const moveCard = useCallback((cardId: string, toColumn: ColumnId) => {

@@ -1,5 +1,8 @@
 import type { OpenSpecCard } from '../types';
 
+// Bump this integer any time card definitions change to trigger merge on next load.
+export const DATA_VERSION = 1;
+
 // Generated from /Users/mattgraves/Development/agentscan/openspec/changes/
 export const SAMPLE_CARDS: OpenSpecCard[] = [
   {

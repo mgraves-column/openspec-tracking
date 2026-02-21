@@ -65,5 +65,6 @@ export interface Column {
 export interface BoardState {
   cards: OpenSpecCard[];
   version: number;
+  dataVersion: number;
   lastSaved: string;
 }
