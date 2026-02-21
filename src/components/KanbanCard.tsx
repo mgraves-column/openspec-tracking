@@ -153,6 +153,32 @@ export function KanbanCard({ card, allCards, onUpdateCard }: Props) {
         )}
       </div>
 
+      {/* Task progress */}
+      {card.progress !== null && card.progress.total > 0 && (
+        <div className="mb-2">
+          <div
+            className="w-full rounded-full overflow-hidden"
+            style={{ height: '2px', background: 'rgba(255,255,255,0.06)' }}
+          >
+            <div
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${Math.round((card.progress.done / card.progress.total) * 100)}%`,
+                background: card.progress.done === card.progress.total ? '#10b981' : '#22c55e80',
+              }}
+            />
+          </div>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-[10px] text-white/35">
+              {card.progress.done}/{card.progress.total} tasks
+            </span>
+            <span className="text-[10px] text-white/25">
+              {Math.round((card.progress.done / card.progress.total) * 100)}%
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Tags */}
       {card.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-1">

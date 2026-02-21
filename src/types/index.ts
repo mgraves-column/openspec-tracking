@@ -51,6 +51,7 @@ export interface OpenSpecCard {
   specs: SubSpec[];
   tags: string[];
   notes: string;
+  progress: { done: number; total: number } | null;
   createdAt: string;
   updatedAt: string;
 }

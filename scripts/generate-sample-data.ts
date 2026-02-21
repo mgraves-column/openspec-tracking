@@ -53,6 +53,7 @@ interface CardData {
   specs: { id: string; name: string; path: string }[];
   tags: string[];
   notes: string;
+  progress: { done: number; total: number } | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -133,6 +134,18 @@ function listSpecs(dirPath: string): CardData['specs'] {
     .sort((a, b) => a.id.localeCompare(b.id));
 }
 
+function parseTaskProgress(dirPath: string): { done: number; total: number } | null {
+  const tasksPath = path.join(dirPath, 'tasks.md');
+  if (!fs.existsSync(tasksPath)) return null;
+
+  const content = fs.readFileSync(tasksPath, 'utf-8');
+  const done = (content.match(/- \[x\]/gi) ?? []).length;
+  const incomplete = (content.match(/- \[ \]/g) ?? []).length;
+  const total = done + incomplete;
+
+  return total > 0 ? { done, total } : null;
+}
+
 function processSpec(dirPath: string, specId: string): CardData | null {
   const proposalPath = path.join(dirPath, 'proposal.md');
   if (!fs.existsSync(proposalPath)) {
@@ -167,6 +180,7 @@ function processSpec(dirPath: string, specId: string): CardData | null {
     specs: listSpecs(dirPath),
     tags: fm.tags ?? [],
     notes: fm.notes ?? '',
+    progress: parseTaskProgress(dirPath),
     createdAt: `${createdAt}T00:00:00Z`,
     updatedAt: `${now}T00:00:00Z`,
   };
@@ -216,6 +230,7 @@ function formatCard(card: CardData): string {
   lines.push(`    specs: ${formatValue(card.specs, 2)},`);
   lines.push(`    tags: ${formatValue(card.tags, 2)},`);
   lines.push(`    notes: ${formatValue(card.notes, 2)},`);
+  lines.push(`    progress: ${formatValue(card.progress, 2)},`);
   lines.push(`    createdAt: ${formatValue(card.createdAt, 2)},`);
   lines.push(`    updatedAt: ${formatValue(card.updatedAt, 2)},`);
   lines.push('  }');
